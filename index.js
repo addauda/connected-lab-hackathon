@@ -3,8 +3,7 @@
 
 const Alexa = require("ask-sdk");
 const https = require("https");
-
-
+const util = require('util');
 
 const invocationName = "household hero";
 
@@ -39,8 +38,6 @@ function getMemoryAttributes() {   const memoryAttributes = {
 };
 
 const maxHistorySize = 20; // remember only latest 20 intents 
-
-
 // 1. Intent Handlers =============================================
 
 const AMAZON_FallbackIntent_Handler =  {
@@ -133,129 +130,35 @@ const AMAZON_StopIntent_Handler =  {
     },
 };
 
-const ReadChores_Handler =  {
+const InProgressReadChores_Handler = {
+	canHandle(handlerInput) {
+	  const request = handlerInput.requestEnvelope.request;
+	  return request.type === 'IntentRequest' &&
+		request.intent.name === 'ReadChores' &&
+		request.dialogState !== 'COMPLETED';
+	},
+	handle(handlerInput) {
+	  const currentIntent = handlerInput.requestEnvelope.request.intent;
+	  return handlerInput.responseBuilder
+		.addDelegateDirective(currentIntent)
+		.getResponse();
+	},
+  };
+
+const CompletedReadChores_Handler =  {
     canHandle(handlerInput) {
         const request = handlerInput.requestEnvelope.request;
-        return request.type === 'IntentRequest' && request.intent.name === 'ReadChores' ;
+        return request.type === 'IntentRequest' && request.intent.name === 'ReadChores' && request.dialogState === 'COMPLETED' ;
     },
     handle(handlerInput) {
         const request = handlerInput.requestEnvelope.request;
         const responseBuilder = handlerInput.responseBuilder;
         let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-        // delegate to Alexa to collect all the required slots 
-        const currentIntent = request.intent; 
-        if (request.dialogState && request.dialogState !== 'COMPLETED') { 
-            return handlerInput.responseBuilder
-                .addDelegateDirective(currentIntent)
-                .getResponse();
-
-        } 
-        let say = 'Hello from ReadChores. ';
-
-        let slotStatus = '';
-        let resolvedSlot;
-
+	
         let slotValues = getSlotValues(request.intent.slots); 
-        // getSlotValues returns .heardAs, .resolved, and .isValidated for each slot, according to request slot status codes ER_SUCCESS_MATCH, ER_SUCCESS_NO_MATCH, or traditional simple request slot without resolutions
-
-        // console.log('***** slotValues: ' +  JSON.stringify(slotValues, null, 2));
-        //   SLOT: chore 
-        if (slotValues.chore.heardAs && slotValues.chore.heardAs !== '') {
-            slotStatus += ' slot chore was heard as ' + slotValues.chore.heardAs + '. ';
-        } else {
-            slotStatus += 'slot chore is empty. ';
-        }
-        if (slotValues.chore.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.chore.resolved !== slotValues.chore.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.chore.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.chore.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.chore.heardAs + '" to the custom slot type used by slot chore! '); 
-        }
-
-        if( (slotValues.chore.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.chore.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('ReadChores','chore'), 'or');
-        }
-        //   SLOT: date 
-        if (slotValues.date.heardAs && slotValues.date.heardAs !== '') {
-            slotStatus += ' slot date was heard as ' + slotValues.date.heardAs + '. ';
-        } else {
-            slotStatus += 'slot date is empty. ';
-        }
-        if (slotValues.date.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.date.resolved !== slotValues.date.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.date.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.date.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.date.heardAs + '" to the custom slot type used by slot date! '); 
-        }
-
-        if( (slotValues.date.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.date.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('ReadChores','date'), 'or');
-        }
-        //   SLOT: child 
-        if (slotValues.child.heardAs && slotValues.child.heardAs !== '') {
-            slotStatus += ' slot child was heard as ' + slotValues.child.heardAs + '. ';
-        } else {
-            slotStatus += 'slot child is empty. ';
-        }
-        if (slotValues.child.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.child.resolved !== slotValues.child.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.child.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.child.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.child.heardAs + '" to the custom slot type used by slot child! '); 
-        }
-
-        if( (slotValues.child.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.child.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('ReadChores','child'), 'or');
-        }
-        //   SLOT: complete 
-        if (slotValues.complete.heardAs && slotValues.complete.heardAs !== '') {
-            slotStatus += ' slot complete was heard as ' + slotValues.complete.heardAs + '. ';
-        } else {
-            slotStatus += 'slot complete is empty. ';
-        }
-        if (slotValues.complete.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.complete.resolved !== slotValues.complete.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.complete.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.complete.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.complete.heardAs + '" to the custom slot type used by slot complete! '); 
-        }
-
-        if( (slotValues.complete.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.complete.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('ReadChores','complete'), 'or');
-        }
-
-        say += slotStatus;
-
-
+        say = util.format('Your task today, oh super hero in training, is to make the bed');
+        console.log('***** slotValues: ' +  JSON.stringify(slotValues, null, 2));
+		
         return responseBuilder
             .speak(say)
             .reprompt('try again, ' + say)
@@ -263,106 +166,72 @@ const ReadChores_Handler =  {
     },
 };
 
-const CreateChores_Handler =  {
+const InProgressCreateChores_Handler = {
+	canHandle(handlerInput) {
+	  const request = handlerInput.requestEnvelope.request;
+	  return request.type === 'IntentRequest' &&
+		request.intent.name === 'CreateChores' &&
+		request.dialogState !== 'COMPLETED';
+	},
+	handle(handlerInput) {
+	  const currentIntent = handlerInput.requestEnvelope.request.intent;
+	  return handlerInput.responseBuilder
+		.addDelegateDirective(currentIntent)
+		.getResponse();
+	},
+  };
+
+const CompletedCreateChores_Handler =  {
     canHandle(handlerInput) {
         const request = handlerInput.requestEnvelope.request;
-        return request.type === 'IntentRequest' && request.intent.name === 'CreateChores' ;
+        return request.type === 'IntentRequest' && request.intent.name === 'CreateChores' && request.dialogState === 'COMPLETED' ;
     },
     handle(handlerInput) {
         const request = handlerInput.requestEnvelope.request;
         const responseBuilder = handlerInput.responseBuilder;
         let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-        // delegate to Alexa to collect all the required slots 
-        const currentIntent = request.intent; 
-        if (request.dialogState && request.dialogState !== 'COMPLETED') { 
-            return handlerInput.responseBuilder
-                .addDelegateDirective(currentIntent)
-                .getResponse();
-
-        } 
-        let say = 'Hello from CreateChores. ';
-
-        let slotStatus = '';
-        let resolvedSlot;
-
+	
         let slotValues = getSlotValues(request.intent.slots); 
-        // getSlotValues returns .heardAs, .resolved, and .isValidated for each slot, according to request slot status codes ER_SUCCESS_MATCH, ER_SUCCESS_NO_MATCH, or traditional simple request slot without resolutions
-
-        // console.log('***** slotValues: ' +  JSON.stringify(slotValues, null, 2));
-        //   SLOT: chore 
-        if (slotValues.chore.heardAs && slotValues.chore.heardAs !== '') {
-            slotStatus += ' slot chore was heard as ' + slotValues.chore.heardAs + '. ';
-        } else {
-            slotStatus += 'slot chore is empty. ';
-        }
-        if (slotValues.chore.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.chore.resolved !== slotValues.chore.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.chore.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.chore.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.chore.heardAs + '" to the custom slot type used by slot chore! '); 
-        }
-
-        if( (slotValues.chore.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.chore.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('CreateChores','chore'), 'or');
-        }
-        //   SLOT: child 
-        if (slotValues.child.heardAs && slotValues.child.heardAs !== '') {
-            slotStatus += ' slot child was heard as ' + slotValues.child.heardAs + '. ';
-        } else {
-            slotStatus += 'slot child is empty. ';
-        }
-        if (slotValues.child.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.child.resolved !== slotValues.child.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.child.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.child.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.child.heardAs + '" to the custom slot type used by slot child! '); 
-        }
-
-        if( (slotValues.child.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.child.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('CreateChores','child'), 'or');
-        }
-        //   SLOT: age 
-        if (slotValues.age.heardAs && slotValues.age.heardAs !== '') {
-            slotStatus += ' slot age was heard as ' + slotValues.age.heardAs + '. ';
-        } else {
-            slotStatus += 'slot age is empty. ';
-        }
-        if (slotValues.age.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.age.resolved !== slotValues.age.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.age.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.age.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.age.heardAs + '" to the custom slot type used by slot age! '); 
-        }
-
-        if( (slotValues.age.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.age.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('CreateChores','age'), 'or');
-        }
-
-        say += slotStatus;
+        say = util.format('Okay, I have added %s to %s\'s list', slotValues.chore.resolved, slotValues.child.heardAs);
+        console.log('***** slotValues: ' +  JSON.stringify(slotValues, null, 2));
+		
+        return responseBuilder
+            .speak(say)
+            .reprompt('try again, ' + say)
+            .getResponse();
+    },
+};
 
 
+const InProgressCompletedChores_Handler = {
+	canHandle(handlerInput) {
+	  const request = handlerInput.requestEnvelope.request;
+	  return request.type === 'IntentRequest' &&
+		request.intent.name === 'CompleteChores' &&
+		request.dialogState !== 'COMPLETED';
+	},
+	handle(handlerInput) {
+	  const currentIntent = handlerInput.requestEnvelope.request.intent;
+	  return handlerInput.responseBuilder
+		.addDelegateDirective(currentIntent)
+		.getResponse();
+	},
+  };
+
+const CompletedChores_Handler =  {
+    canHandle(handlerInput) {
+        const request = handlerInput.requestEnvelope.request;
+        return request.type === 'IntentRequest' && request.intent.name === 'CompleteChores' && request.dialogState === 'COMPLETED' ;
+    },
+    handle(handlerInput) {
+        const request = handlerInput.requestEnvelope.request;
+        const responseBuilder = handlerInput.responseBuilder;
+        let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+	
+        let slotValues = getSlotValues(request.intent.slots); 
+        say = util.format('Congratulations');
+        console.log('***** slotValues: ' +  JSON.stringify(slotValues, null, 2));
+		
         return responseBuilder
             .speak(say)
             .reprompt('try again, ' + say)
@@ -396,100 +265,8 @@ const UpdateChores_Handler =  {
         let slotValues = getSlotValues(request.intent.slots); 
         // getSlotValues returns .heardAs, .resolved, and .isValidated for each slot, according to request slot status codes ER_SUCCESS_MATCH, ER_SUCCESS_NO_MATCH, or traditional simple request slot without resolutions
 
-        // console.log('***** slotValues: ' +  JSON.stringify(slotValues, null, 2));
-        //   SLOT: chore 
-        if (slotValues.chore.heardAs && slotValues.chore.heardAs !== '') {
-            slotStatus += ' slot chore was heard as ' + slotValues.chore.heardAs + '. ';
-        } else {
-            slotStatus += 'slot chore is empty. ';
-        }
-        if (slotValues.chore.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.chore.resolved !== slotValues.chore.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.chore.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.chore.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.chore.heardAs + '" to the custom slot type used by slot chore! '); 
-        }
-
-        if( (slotValues.chore.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.chore.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('UpdateChores','chore'), 'or');
-        }
-        //   SLOT: date 
-        if (slotValues.date.heardAs && slotValues.date.heardAs !== '') {
-            slotStatus += ' slot date was heard as ' + slotValues.date.heardAs + '. ';
-        } else {
-            slotStatus += 'slot date is empty. ';
-        }
-        if (slotValues.date.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.date.resolved !== slotValues.date.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.date.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.date.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.date.heardAs + '" to the custom slot type used by slot date! '); 
-        }
-
-        if( (slotValues.date.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.date.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('UpdateChores','date'), 'or');
-        }
-        //   SLOT: child 
-        if (slotValues.child.heardAs && slotValues.child.heardAs !== '') {
-            slotStatus += ' slot child was heard as ' + slotValues.child.heardAs + '. ';
-        } else {
-            slotStatus += 'slot child is empty. ';
-        }
-        if (slotValues.child.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.child.resolved !== slotValues.child.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.child.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.child.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.child.heardAs + '" to the custom slot type used by slot child! '); 
-        }
-
-        if( (slotValues.child.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.child.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('UpdateChores','child'), 'or');
-        }
-        //   SLOT: complete 
-        if (slotValues.complete.heardAs && slotValues.complete.heardAs !== '') {
-            slotStatus += ' slot complete was heard as ' + slotValues.complete.heardAs + '. ';
-        } else {
-            slotStatus += 'slot complete is empty. ';
-        }
-        if (slotValues.complete.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if(slotValues.complete.resolved !== slotValues.complete.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.complete.resolved + '. '; 
-                } else {
-                slotStatus += 'match. '
-            } // else {
-                //
-        }
-        if (slotValues.complete.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.complete.heardAs + '" to the custom slot type used by slot complete! '); 
-        }
-
-        if( (slotValues.complete.ERstatus === 'ER_SUCCESS_NO_MATCH') ||  (!slotValues.complete.heardAs) ) {
-           // slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('UpdateChores','complete'), 'or');
-        }
-
+        console.log('***** slotValues: ' +  JSON.stringify(slotValues, null, 2));
+        
         say += slotStatus;
 
 
@@ -951,11 +728,15 @@ exports.handler = skillBuilder
         AMAZON_CancelIntent_Handler, 
         AMAZON_HelpIntent_Handler, 
         AMAZON_StopIntent_Handler, 
-        ReadChores_Handler, 
-        CreateChores_Handler, 
+		CompletedReadChores_Handler.
+		InProgressReadChores_Handler, 
+		InProgressCreateChores_Handler,
+        CompletedCreateChores_Handler, 
         UpdateChores_Handler, 
         LaunchRequest_Handler, 
-        SessionEndedHandler
+        SessionEndedHandler,
+        InProgressCompletedChores_Handler,
+        CompletedChores_Handler
     )
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
