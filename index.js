@@ -510,9 +510,11 @@ const LaunchRequest_Handler =  {
 
         let say = 'hello' + ' and welcome to ' + invocationName + ' ! Would you like to create a chores list?';
 
+		console.log('here -- 1')
+
         let skillTitle = capitalize(invocationName);
 
-
+		console.log('here -- 2')
         return responseBuilder
             .speak(say)
             .reprompt('try again, ' + say)
@@ -976,437 +978,569 @@ exports.handler = skillBuilder
 // Static Language Model for reference
 
 const model = {
-  "interactionModel": {
-    "languageModel": {
-      "invocationName": "household hero",
-      "intents": [
-        {
-          "name": "AMAZON.FallbackIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.CancelIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.HelpIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.StopIntent",
-          "samples": []
-        },
-        {
-          "name": "ReadChores",
-          "slots": [
-            {
-              "name": "chore",
-              "type": "ChoreType",
-              "samples": [
-                "Please tell me {child} 's list",
-                "Please read me {child} 's  list"
-              ]
-            },
-            {
-              "name": "date",
-              "type": "AMAZON.DATE",
-              "samples": [
-                "{date}"
-              ]
-            },
-            {
-              "name": "child",
-              "type": "AMAZON.US_FIRST_NAME",
-              "samples": [
-                "{child}"
-              ]
-            },
-            {
-              "name": "complete",
-              "type": "ChoreComplete",
-              "samples": [
-                "{complete}"
-              ]
-            }
-          ],
-          "samples": [
-            "Has {child} completed all her {chore}",
-            "What is on {child} list {date}",
-            "What do I have to do {date}",
-            "Did {child} {chore} {date}",
-            "Who is {chore} {date}"
-          ]
-        },
-        {
-          "name": "CreateChores",
-          "slots": [
-            {
-              "name": "chore",
-              "type": "ChoreType",
-              "samples": [
-                "Please add {chore}"
-              ]
-            },
-            {
-              "name": "child",
-              "type": "AMAZON.US_FIRST_NAME",
-              "samples": [
-                "This list belongs to {child} "
-              ]
-            },
-            {
-              "name": "age",
-              "type": "AMAZON.NUMBER",
-              "samples": [
-                "{child} is {age}"
-              ]
-            }
-          ],
-          "samples": [
-            "create a list of {chore} for {age} {child}",
-            "create a list of {chore} for {child}"
-          ]
-        },
-        {
-          "name": "UpdateChores",
-          "slots": [
-            {
-              "name": "chore",
-              "type": "ChoreType",
-              "samples": [
-                "{chore} {date}"
-              ]
-            },
-            {
-              "name": "date",
-              "type": "AMAZON.DATE",
-              "samples": [
-                "{date}"
-              ]
-            },
-            {
-              "name": "child",
-              "type": "AMAZON.US_FIRST_NAME",
-              "samples": [
-                "{child}"
-              ]
-            },
-            {
-              "name": "complete",
-              "type": "ChoreComplete",
-              "samples": [
-                "{complete}"
-              ]
-            }
-          ],
-          "samples": [
-            "I have {complete} {chore}",
-            "Please add {chore} on {date} and {date} to {child} list"
-          ]
-        },
-        {
-          "name": "LaunchRequest"
-        }
-      ],
-      "types": [
-        {
-          "name": "ChoreType",
-          "values": [
-            {
-              "name": {
-                "value": "take out the recycling"
-              }
-            },
-            {
-              "name": {
-                "value": "wash the dishes"
-              }
-            },
-            {
-              "name": {
-                "value": "clean your room"
-              }
-            },
-            {
-              "name": {
-                "value": "brush your teeth"
-              }
-            },
-            {
-              "name": {
-                "value": "make your bed"
-              }
-            },
-            {
-              "name": {
-                "value": "feed the dog"
-              }
-            }
-          ]
-        },
-        {
-          "name": "ChoreComplete",
-          "values": [
-            {
-              "id": "No",
-              "name": {
-                "value": "Incomplete",
-                "synonyms": [
-                  "i have not",
-                  "not yet",
-                  "not completed",
-                  "no"
-                ]
-              }
-            },
-            {
-              "id": "Yes",
-              "name": {
-                "value": "Complete",
-                "synonyms": [
-                  "finished",
-                  "done",
-                  "completed",
-                  "yes"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    "dialog": {
-      "intents": [
-        {
-          "name": "ReadChores",
-          "confirmationRequired": false,
-          "prompts": {},
-          "slots": [
-            {
-              "name": "chore",
-              "type": "ChoreType",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.278245436552.685385816716"
-              }
-            },
-            {
-              "name": "date",
-              "type": "AMAZON.DATE",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.278245436552.745285083351"
-              }
-            },
-            {
-              "name": "child",
-              "type": "AMAZON.US_FIRST_NAME",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.278245436552.653448442792"
-              }
-            },
-            {
-              "name": "complete",
-              "type": "ChoreComplete",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.278245436552.579860287117"
-              }
-            }
-          ]
-        },
-        {
-          "name": "CreateChores",
-          "confirmationRequired": false,
-          "prompts": {},
-          "slots": [
-            {
-              "name": "chore",
-              "type": "ChoreType",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.601721777091.603128300016"
-              }
-            },
-            {
-              "name": "child",
-              "type": "AMAZON.US_FIRST_NAME",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.1243427686080.245846715034"
-              }
-            },
-            {
-              "name": "age",
-              "type": "AMAZON.NUMBER",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.1243427686080.372157838536"
-              }
-            }
-          ]
-        },
-        {
-          "name": "UpdateChores",
-          "confirmationRequired": false,
-          "prompts": {},
-          "slots": [
-            {
-              "name": "chore",
-              "type": "ChoreType",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.1249155284143.405531388857"
-              }
-            },
-            {
-              "name": "date",
-              "type": "AMAZON.DATE",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.1249155284143.788496085165"
-              }
-            },
-            {
-              "name": "child",
-              "type": "AMAZON.US_FIRST_NAME",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.1249155284143.981944910901"
-              }
-            },
-            {
-              "name": "complete",
-              "type": "ChoreComplete",
-              "confirmationRequired": false,
-              "elicitationRequired": true,
-              "prompts": {
-                "elicitation": "Elicit.Slot.1249155284143.1202221522144"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    "prompts": [
-      {
-        "id": "Elicit.Slot.601721777091.603128300016",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "What chore should be added to the list?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.1243427686080.245846715034",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "To whom are you assigning these chores?"
-          },
-          {
-            "type": "PlainText",
-            "value": "Who are these chores for?"
-          },
-          {
-            "type": "PlainText",
-            "value": "To whom will this list belong?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.1243427686080.372157838536",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "How old is {child} ?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.278245436552.685385816716",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "Would you like to hear {child} chores list?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.278245436552.745285083351",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "For which days would you like to hear the chores list?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.1249155284143.405531388857",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "What chore should be added to the list?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.1249155284143.788496085165",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "When should {chore} be completed?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.1249155284143.981944910901",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "Who should complete {chore} ?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.1249155284143.1202221522144",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "Has {chore} been completed?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.278245436552.653448442792",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "Whose chores list would you like to hear?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.278245436552.579860287117",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "Is {chore} completed?"
-          }
-        ]
-      }
-    ]
-  }
+	"interactionModel": {
+	  "languageModel": {
+		"invocationName": "household hero",
+		"intents": [
+		  {
+			"name": "AMAZON.FallbackIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.CancelIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.HelpIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.StopIntent",
+			"samples": []
+		  },
+		  {
+			"name": "ReadChores",
+			"slots": [
+			  {
+				"name": "chore",
+				"type": "ChoreType",
+				"samples": [
+				  "Please tell me {child} 's list",
+				  "Please read me {child} 's  list"
+				]
+			  },
+			  {
+				"name": "date",
+				"type": "AMAZON.DATE",
+				"samples": [
+				  "{date}"
+				]
+			  },
+			  {
+				"name": "child",
+				"type": "AMAZON.US_FIRST_NAME",
+				"samples": [
+				  "{child}"
+				]
+			  },
+			  {
+				"name": "complete",
+				"type": "ChoreComplete",
+				"samples": [
+				  "{complete}"
+				]
+			  }
+			],
+			"samples": [
+			  "Has {child} completed all her {chore}",
+			  "What is on {child} list {date}",
+			  "What do I have to do {date}",
+			  "Did {child} {chore} {date}",
+			  "Who is {chore} {date}"
+			]
+		  },
+		  {
+			"name": "CreateChores",
+			"slots": [
+			  {
+				"name": "chore",
+				"type": "ChoreType",
+				"samples": [
+				  "Please add {chore}"
+				]
+			  },
+			  {
+				"name": "child",
+				"type": "AMAZON.US_FIRST_NAME",
+				"samples": [
+				  "This list belongs to {child} "
+				]
+			  },
+			  {
+				"name": "age",
+				"type": "AMAZON.NUMBER",
+				"samples": [
+				  "{child} is {age}"
+				]
+			  }
+			],
+			"samples": [
+			  "create a list",
+			  "create a list of {chore} for {age} {child}",
+			  "create a list of {chore} for {child}"
+			]
+		  },
+		  {
+			"name": "UpdateChores",
+			"slots": [
+			  {
+				"name": "chore",
+				"type": "ChoreType",
+				"samples": [
+				  "{chore} {date}"
+				]
+			  },
+			  {
+				"name": "date",
+				"type": "AMAZON.DATE",
+				"samples": [
+				  "{date}"
+				]
+			  },
+			  {
+				"name": "child",
+				"type": "AMAZON.US_FIRST_NAME",
+				"samples": [
+				  "{child}"
+				]
+			  }
+			],
+			"samples": [
+			  "Please add {chore} on {date} and {date} to {child} list"
+			]
+		  },
+		  {
+			"name": "AMAZON.MoreIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.NavigateHomeIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.NavigateSettingsIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.NextIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.PageUpIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.PageDownIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.PreviousIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.ScrollRightIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.ScrollDownIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.ScrollLeftIntent",
+			"samples": []
+		  },
+		  {
+			"name": "AMAZON.ScrollUpIntent",
+			"samples": []
+		  },
+		  {
+			"name": "CompleteChores",
+			"slots": [
+			  {
+				"name": "completed",
+				"type": "ChoreComplete",
+				"samples": [
+				  "I have {completed} {chore}"
+				]
+			  },
+			  {
+				"name": "chore",
+				"type": "ChoreType",
+				"samples": [
+				  "{chore}"
+				]
+			  },
+			  {
+				"name": "reward",
+				"type": "ChoreReward"
+			  }
+			],
+			"samples": [
+			  "I have {completed} a chore",
+			  "I have {completed} {chore}"
+			]
+		  },
+		  {
+			"name": "LaunchRequest"
+		  }
+		],
+		"types": [
+		  {
+			"name": "ChoreType",
+			"values": [
+			  {
+				"name": {
+				  "value": "take out the recycling"
+				}
+			  },
+			  {
+				"name": {
+				  "value": "wash the dishes"
+				}
+			  },
+			  {
+				"name": {
+				  "value": "clean your room"
+				}
+			  },
+			  {
+				"name": {
+				  "value": "brush your teeth"
+				}
+			  },
+			  {
+				"name": {
+				  "value": "make your bed"
+				}
+			  },
+			  {
+				"name": {
+				  "value": "feed the dog"
+				}
+			  }
+			]
+		  },
+		  {
+			"name": "ChoreComplete",
+			"values": [
+			  {
+				"id": "No",
+				"name": {
+				  "value": "Incomplete",
+				  "synonyms": [
+					"i have not",
+					"not yet",
+					"not completed",
+					"no"
+				  ]
+				}
+			  },
+			  {
+				"id": "Yes",
+				"name": {
+				  "value": "Complete",
+				  "synonyms": [
+					"defeat",
+					"topple",
+					"conquer",
+					"finished",
+					"done",
+					"completed",
+					"yes"
+				  ]
+				}
+			  }
+			]
+		  },
+		  {
+			"name": "ChoreReward",
+			"values": [
+			  {
+				"id": "Sticker",
+				"name": {
+				  "value": "RewardSticker"
+				}
+			  }
+			]
+		  }
+		]
+	  },
+	  "dialog": {
+		"intents": [
+		  {
+			"name": "ReadChores",
+			"confirmationRequired": false,
+			"prompts": {},
+			"slots": [
+			  {
+				"name": "chore",
+				"type": "ChoreType",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.278245436552.685385816716"
+				}
+			  },
+			  {
+				"name": "date",
+				"type": "AMAZON.DATE",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.278245436552.745285083351"
+				}
+			  },
+			  {
+				"name": "child",
+				"type": "AMAZON.US_FIRST_NAME",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.278245436552.653448442792"
+				}
+			  },
+			  {
+				"name": "complete",
+				"type": "ChoreComplete",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.278245436552.579860287117"
+				}
+			  }
+			]
+		  },
+		  {
+			"name": "CreateChores",
+			"confirmationRequired": false,
+			"prompts": {},
+			"slots": [
+			  {
+				"name": "chore",
+				"type": "ChoreType",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.601721777091.603128300016"
+				}
+			  },
+			  {
+				"name": "child",
+				"type": "AMAZON.US_FIRST_NAME",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.1243427686080.245846715034"
+				}
+			  },
+			  {
+				"name": "age",
+				"type": "AMAZON.NUMBER",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.1243427686080.372157838536"
+				}
+			  }
+			]
+		  },
+		  {
+			"name": "UpdateChores",
+			"confirmationRequired": false,
+			"prompts": {},
+			"slots": [
+			  {
+				"name": "chore",
+				"type": "ChoreType",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.1249155284143.405531388857"
+				}
+			  },
+			  {
+				"name": "date",
+				"type": "AMAZON.DATE",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.1249155284143.788496085165"
+				}
+			  },
+			  {
+				"name": "child",
+				"type": "AMAZON.US_FIRST_NAME",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.1249155284143.981944910901"
+				}
+			  }
+			]
+		  },
+		  {
+			"name": "CompleteChores",
+			"confirmationRequired": false,
+			"prompts": {},
+			"slots": [
+			  {
+				"name": "completed",
+				"type": "ChoreComplete",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.675560985485.839148580208"
+				}
+			  },
+			  {
+				"name": "chore",
+				"type": "ChoreType",
+				"confirmationRequired": false,
+				"elicitationRequired": true,
+				"prompts": {
+				  "elicitation": "Elicit.Slot.675560985485.862231694055"
+				}
+			  },
+			  {
+				"name": "reward",
+				"type": "ChoreReward",
+				"confirmationRequired": false,
+				"elicitationRequired": false,
+				"prompts": {}
+			  }
+			]
+		  }
+		]
+	  },
+	  "prompts": [
+		{
+		  "id": "Elicit.Slot.601721777091.603128300016",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "What chore should be added to the list?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.1243427686080.245846715034",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "To whom are you assigning these chores?"
+			},
+			{
+			  "type": "PlainText",
+			  "value": "Who are these chores for?"
+			},
+			{
+			  "type": "PlainText",
+			  "value": "To whom will this list belong?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.1243427686080.372157838536",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "How old is {child} ?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.278245436552.685385816716",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "Would you like to hear {child} chores list?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.278245436552.745285083351",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "For which days would you like to hear the chores list?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.1249155284143.405531388857",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "What chore should be added to the list?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.1249155284143.788496085165",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "When should {chore} be completed?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.1249155284143.981944910901",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "Who should complete {chore} ?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.1249155284143.1202221522144",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "Has {chore} been completed?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.278245436552.653448442792",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "Whose chores list would you like to hear?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.278245436552.579860287117",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "Is {chore} completed?"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.147254050712.10839804104",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "Congratulation. You have earned a new reward."
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.675560985485.839148580208",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "What {chore} has been {completed} ?"
+			},
+			{
+			  "type": "PlainText",
+			  "value": "Congratulations, you have earned a new {reward}"
+			}
+		  ]
+		},
+		{
+		  "id": "Elicit.Slot.675560985485.862231694055",
+		  "variations": [
+			{
+			  "type": "PlainText",
+			  "value": "What chore has been {completed} ?"
+			}
+		  ]
+		}
+	  ]
+	}
 };
